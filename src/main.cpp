@@ -93,7 +93,12 @@ int main() {
             if (dx != 0 || dy != 0) {
                 const int newX = player.getX() + dx;
                 const int newY = player.getY() + dy;
-                if (level.isWalkable(newX, newY)) {
+
+                // if there is a trapped character, the tile is not walkable 
+                const bool blockedByChinese = !trapped.isRescued() && trapped.getX() == newX && trapped.getY() == newY;
+                const bool blockedByIndian  = !trapped2.isRescued() && trapped2.getX() == newX && trapped2.getY() == newY;
+
+                if (level.isWalkable(newX, newY) && !blockedByChinese && !blockedByIndian) {
                     player.setPosition(newX, newY);
 
                     if (level.getTile(newX, newY) == TileType::Hazard) {
