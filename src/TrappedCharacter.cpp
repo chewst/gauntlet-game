@@ -3,7 +3,7 @@
 TrappedCharacter::TrappedCharacter(int gridX, int gridY, Color color, std::string name) 
 : Actor(gridX, gridY, color, std::move(name)) {}
 
-bool TrappedCharacter::ism_rescued() const {
+bool TrappedCharacter::isRescued() const {
     return m_rescued;
 }
 
