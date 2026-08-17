@@ -67,6 +67,14 @@ void drawActor(const Actor& actor) {
     DrawCircle(centerX, centerY, static_cast<float>(radius), actor.getColor());
 }
 
+void drawExitMarker(int gridX, int gridY) {
+    const float centerX = gridX * TILE_SIZE + TILE_SIZE / 2.0f;
+    const float centerY = gridY * TILE_SIZE + UI_HEIGHT + TILE_SIZE / 2.0f;
+
+    // DrawRing(center, innerRadius, outerRadius, startAngle, endAngle, segments, color);
+    DrawRing({centerX, centerY}, 10.0f, 20.0f, 0.0f, 360.0f, 32, ORANGE);
+}
+
 int main() {
     InitWindow(GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE + UI_HEIGHT, "Malaysia");
     SetTargetFPS(60);  // set the frame rate
@@ -132,6 +140,7 @@ int main() {
         DrawText(trapped2.isRescued() ? "Indian: rescued, walk together" : "Indian: trapped, find and press E", 140, 36, 20, DARKGRAY);
 
         drawGrid(level);
+        drawExitMarker(9, 2);    // same as the exit tile
         drawActor(player);
 
         if (!trapped.isRescued()) {
