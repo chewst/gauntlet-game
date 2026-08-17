@@ -3,8 +3,9 @@
 #include "Player.hpp"
 #include "TrappedCharacter.hpp"
 #include <memory>
+#include <vector>
 
-const int TILE_SIZE = 50;    // each tile is 50 × 50 pixels
+const int TILE_SIZE = 50;    // each tile is 50 x 50 pixels
 const int GRID_WIDTH = 16;
 const int GRID_HEIGHT = 10;
 const int UI_HEIGHT = 60;    // top 60 pixels are reserved for the UI
@@ -48,6 +49,15 @@ bool isAdjacent(const Actor& a, const Actor& b) {
     return (dx * dx + dy * dy) <= 1;
 }
 
+bool allRescued(const std::vector<TrappedCharacter>& characters) {
+    for (const auto& character : characters) {
+        if (!character.isRescued()) {
+            return false;
+        }
+    }
+    return true;
+}
+
 void drawGrid(const Grid& grid) {
     for (int y = 0; y < grid.getHeight(); ++y) {
         for (int x = 0; x < grid.getWidth(); ++x) {
@@ -75,6 +85,16 @@ void drawExitMarker(int gridX, int gridY) {
     DrawRing({centerX, centerY}, 10.0f, 20.0f, 0.0f, 360.0f, 32, ORANGE);
 }
 
+void drawStatusText(const std::vector<TrappedCharacter>& characters) {
+    int lineY = 12;
+    for (const auto& character : characters) {
+        const std::string status = character.getName() +
+            (character.isRescued() ? ": rescued, walk together" : ": trapped, find and press E");
+        DrawText(status.c_str(), 140, lineY, 20, DARKGRAY);
+        lineY += 24;
+    }
+}
+
 int main() {
     InitWindow(GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE + UI_HEIGHT, "Malaysia");
     SetTargetFPS(60);  // set the frame rate
@@ -82,8 +102,11 @@ int main() {
     Grid level = buildPeninsulaMap();
 
     Player player(2, 2, DARKGREEN, "Malay");
-    TrappedCharacter trapped(12, 5, RED, "Chinese");
-    TrappedCharacter trapped2(6, 8, DARKBLUE, "Indian");
+
+    std::vector<TrappedCharacter> trappedCharacters = {
+        TrappedCharacter(9, 5, RED, "Chinese"),
+        TrappedCharacter(6, 8, DARKBLUE, "Indian")
+    };
 
     int hp = 3;
     bool won = false;
@@ -102,11 +125,16 @@ int main() {
                 const int newX = player.getX() + dx;
                 const int newY = player.getY() + dy;
 
-                // if there is a trapped character, the tile is not walkable 
-                const bool blockedByChinese = !trapped.isRescued() && trapped.getX() == newX && trapped.getY() == newY;
-                const bool blockedByIndian  = !trapped2.isRescued() && trapped2.getX() == newX && trapped2.getY() == newY;
+                // a tile with an un-rescued trapped character on it is not walkable
+                bool blocked = false;
+                for (const auto& character : trappedCharacters) {
+                    if (!character.isRescued() && character.getX() == newX && character.getY() == newY) {
+                        blocked = true;
+                        break;
+                    }
+                }
 
-                if (level.isWalkable(newX, newY) && !blockedByChinese && !blockedByIndian) {
+                if (level.isWalkable(newX, newY) && !blocked) {
                     player.setPosition(newX, newY);
 
                     if (level.getTile(newX, newY) == TileType::Hazard) {
@@ -115,40 +143,37 @@ int main() {
                 }
             }
 
-            if (IsKeyPressed(KEY_E) && !trapped.isRescued() && isAdjacent(player, trapped)) {
-                trapped.rescue();
-            }
-
-            if (IsKeyPressed(KEY_E) && !trapped2.isRescued() && isAdjacent(player, trapped2)) {
-                trapped2.rescue();
+            if (IsKeyPressed(KEY_E)) {
+                for (auto& character : trappedCharacters) {
+                    if (!character.isRescued() && isAdjacent(player, character)) {
+                        character.rescue();
+                    }
+                }
             }
 
             if (hp <= 0) {
                 lost = true;
             }
-            if (trapped.isRescued() && trapped2.isRescued()
+            if (allRescued(trappedCharacters)
                 && level.getTile(player.getX(), player.getY()) == TileType::Exit) {
                 won = true;
             }
         }
 
-        BeginDrawing();   
+        BeginDrawing();
         ClearBackground(RAYWHITE);
 
         DrawText(TextFormat("HP: %d", hp), 12, 12, 24, MAROON);
-        DrawText(trapped.isRescued() ? "Chinese: rescued, walk together" : "Chinese: trapped, find and press E", 140, 12, 20, DARKGRAY);
-        DrawText(trapped2.isRescued() ? "Indian: rescued, walk together" : "Indian: trapped, find and press E", 140, 36, 20, DARKGRAY);
+        drawStatusText(trappedCharacters);
 
         drawGrid(level);
         drawExitMarker(9, 2);    // same as the exit tile
         drawActor(player);
 
-        if (!trapped.isRescued()) {
-            drawActor(trapped);
-        }
-
-        if (!trapped2.isRescued()) {
-            drawActor(trapped2);
+        for (const auto& character : trappedCharacters) {
+            if (!character.isRescued()) {
+                drawActor(character);
+            }
         }
 
         if (won) {
