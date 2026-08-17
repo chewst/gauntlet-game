@@ -104,11 +104,10 @@ int main() {
     Player player(2, 2, DARKGREEN, "Malay");
 
     std::vector<TrappedCharacter> trappedCharacters = {
-        TrappedCharacter(9, 5, RED, "Chinese"),
-        TrappedCharacter(6, 8, DARKBLUE, "Indian")
+        TrappedCharacter(12, 5, RED, "Chinese"),
+        TrappedCharacter(5, 7, DARKBLUE, "Indian")
     };
 
-    int hp = 3;
     bool won = false;
     bool lost = false;
 
@@ -138,7 +137,7 @@ int main() {
                     player.setPosition(newX, newY);
 
                     if (level.getTile(newX, newY) == TileType::Hazard) {
-                        --hp;
+                        player.takeDamage(1);
                     }
                 }
             }
@@ -151,7 +150,7 @@ int main() {
                 }
             }
 
-            if (hp <= 0) {
+            if (!player.isAlive()) {
                 lost = true;
             }
             if (allRescued(trappedCharacters)
@@ -163,7 +162,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawText(TextFormat("HP: %d", hp), 12, 12, 24, MAROON);
+        DrawText(TextFormat("HP: %d", player.getHp()), 12, 12, 24, MAROON);
         drawStatusText(trappedCharacters);
 
         drawGrid(level);
