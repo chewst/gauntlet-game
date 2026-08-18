@@ -2,6 +2,9 @@
 #include "Grid.hpp"
 #include "Player.hpp"
 #include "TrappedCharacter.hpp"
+
+#include "Enemy.hpp"
+#include "Tiger.hpp"
 #include <memory>
 #include <vector>
 
@@ -108,6 +111,9 @@ int main() {
         TrappedCharacter(5, 7, DARKBLUE, "Indian")
     };
 
+    std::vector<std::unique_ptr<Enemy>> enemies;
+    enemies.push_back(std::make_unique<Tiger>(4, 4, 10, ORANGE, "Tiger"));
+
     bool won = false;
     bool lost = false;
 
@@ -138,6 +144,18 @@ int main() {
 
                     if (level.getTile(newX, newY) == TileType::Hazard) {
                         player.takeDamage(1);
+                    }
+
+                    // enemies take their turn right after the player moves
+                    for (auto& enemy : enemies) {
+                        enemy->takeTurn(level, player.getX(), player.getY());
+                    }
+
+                    // check for enemy contact once, after everyone has moved this turn
+                    for (const auto& enemy : enemies) {
+                        if (isAdjacent(player, *enemy)) {
+                            player.takeDamage(1);
+                        }
                     }
                 }
             }
