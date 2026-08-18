@@ -108,7 +108,7 @@ int main() {
 
     std::vector<TrappedCharacter> trappedCharacters = {
         TrappedCharacter(12, 5, RED, "Chinese"),
-        TrappedCharacter(5, 7, DARKBLUE, "Indian")
+        TrappedCharacter(5, 7, BLUE, "Indian")
     };
 
     std::vector<std::unique_ptr<Enemy>> enemies;
@@ -116,6 +116,10 @@ int main() {
 
     bool won = false;
     bool lost = false;
+
+    // for text display
+    std::string damageMessage;
+    int damageMessageTimer = 0;   // counts down frames; message shows while > 0
 
     while (!WindowShouldClose()) {
         if (!won && !lost) {
@@ -144,6 +148,8 @@ int main() {
 
                     if (level.getTile(newX, newY) == TileType::Hazard) {
                         player.takeDamage(1);
+                        damageMessage = "Ouch! Hazard hurt you! HP is now " + std::to_string(player.getHp());
+                        damageMessageTimer = 90;   // roughly 1.5 seconds at 60 FPS
                     }
 
                     // enemies take their turn right after the player moves
@@ -155,6 +161,8 @@ int main() {
                     for (const auto& enemy : enemies) {
                         if (isAdjacent(player, *enemy)) {
                             player.takeDamage(1);
+                            damageMessage = enemy->getName() + " hurt you! HP is now " + std::to_string(player.getHp());
+                            damageMessageTimer = 90;
                         }
                     }
                 }
@@ -187,6 +195,25 @@ int main() {
         drawExitMarker(9, 2);    // same as the exit tile
         drawActor(player);
 
+        for (const auto& enemy : enemies) {
+            drawActor(*enemy);   
+        }
+
+        if (damageMessageTimer > 0) {
+            --damageMessageTimer;
+
+            const int fontSize = 20;
+            const int textWidth = MeasureText(damageMessage.c_str(), fontSize);
+
+            const int margin = 12;
+            const int textX = GRID_WIDTH * TILE_SIZE - textWidth - margin;
+            const int textY = GRID_HEIGHT * TILE_SIZE + UI_HEIGHT - fontSize - margin;
+
+            // small background box so the text stays readable over any tile colour
+            DrawRectangle(textX - 8, textY - 4, textWidth + 16, fontSize + 8, Fade(BLACK, 0.5f));
+            DrawText(damageMessage.c_str(), textX, textY, fontSize, WHITE);
+        }
+
         for (const auto& character : trappedCharacters) {
             if (!character.isRescued()) {
                 drawActor(character);
@@ -197,7 +224,7 @@ int main() {
             DrawText("United! You win.", GRID_WIDTH * TILE_SIZE / 2 - 140, GRID_HEIGHT * TILE_SIZE / 2 + UI_HEIGHT, 28, DARKGREEN);
         }
         if (lost) {
-            DrawText("The journey ends here.", GRID_WIDTH * TILE_SIZE / 2 - 160, GRID_HEIGHT * TILE_SIZE / 2 + UI_HEIGHT, 28, MAROON);
+            DrawText("The journey ends here.", GRID_WIDTH * TILE_SIZE / 2 - 160, GRID_HEIGHT * TILE_SIZE / 2 + UI_HEIGHT, 28, DARKBLUE);
         }
 
         EndDrawing();
