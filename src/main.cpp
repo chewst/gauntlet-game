@@ -172,6 +172,10 @@ int main() {
                 for (auto& character : trappedCharacters) {
                     if (!character.isRescued() && isAdjacent(player, character)) {
                         character.rescue();
+                        player.increaseMaxHp(1);
+                        damageMessage = "Unity gives strength! " + character.getName()
+                            + " joined. Max HP is now " + std::to_string(player.getHp());
+                        damageMessageTimer = 90;
                     }
                 }
             }
@@ -188,7 +192,7 @@ int main() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        DrawText(TextFormat("HP: %d", player.getHp()), 12, 12, 24, MAROON);
+        DrawText(TextFormat("HP: %d/%d", player.getHp(), player.getMaxHp()), 12, 12, 24, MAROON);
         drawStatusText(trappedCharacters);
 
         drawGrid(level);
