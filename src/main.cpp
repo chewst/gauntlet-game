@@ -10,7 +10,7 @@
 #include <vector>
 #include <ctime>
 
-const int TILE_SIZE = 50;    // each tile is 50 x 50 pixels
+const int TILE_SIZE = 75;    // each tile is 50 x 50 pixels
 const int GRID_WIDTH = 16;
 const int GRID_HEIGHT = 10;
 const int UI_HEIGHT = 60;    // top 60 pixels are reserved for the UI
@@ -111,12 +111,13 @@ int main() {
     Player player(2, 2, DARKGREEN, "Malay");
 
     std::vector<TrappedCharacter> trappedCharacters = {
-        TrappedCharacter(12, 5, RED, "Chinese"),
+        TrappedCharacter(13, 5, RED, "Chinese"),
         TrappedCharacter(5, 7, BLUE, "Indian")
     };
 
     std::vector<std::unique_ptr<Enemy>> enemies;
     enemies.push_back(std::make_unique<Tiger>(4, 4, 10, ORANGE, "Tiger"));
+    enemies.push_back(std::make_unique<Tiger>(11, 3, 8, ORANGE, "Tiger2", true)); // allow vertical
 
     Trap trap(GRID_WIDTH, GRID_HEIGHT);
 
