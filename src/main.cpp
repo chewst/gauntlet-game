@@ -10,7 +10,7 @@
 #include <vector>
 #include <ctime>
 
-const int TILE_SIZE = 50;    // each tile is 50 x 50 pixels
+const int TILE_SIZE = 80;    // each tile is 50 x 50 pixels
 const int GRID_WIDTH = 16;
 const int GRID_HEIGHT = 10;
 const int UI_HEIGHT = 60;    // top 60 pixels are reserved for the UI
@@ -197,7 +197,7 @@ int main() {
                     }
 
                     if (trap.isActiveAt(newX, newY)) {
-                        player.takeDamage(1);
+                        player.takeDamage(2);
                         damageMessage = "You stepped into a trap! HP is now " + std::to_string(player.getHp());
                         damageMessageTimer = 90;
                     }
