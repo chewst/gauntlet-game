@@ -161,7 +161,7 @@ int main() {
 
                     // enemies take their turn right after the player moves
                     for (auto& enemy : enemies) {
-                        enemy->takeTurn(level, player.getX(), player.getY());
+                        enemy->takeTurn(level);
                     }
                     
                     trap.update(level);

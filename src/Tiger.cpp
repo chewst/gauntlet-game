@@ -7,10 +7,7 @@ Tiger::Tiger(int gridX, int gridY, int patrolEnd, Color color, std::string name,
       m_movingForward(patrolEnd > m_patrolStart),
       m_vertical(vertical) {}
 
-void Tiger::takeTurn(const Grid& grid, int playerX, int playerY) {
-    // unused for tiger
-    (void)playerX;
-    (void)playerY;
+void Tiger::takeTurn(const Grid& grid) {
 
     const int step = m_movingForward ? 1 : -1;
 

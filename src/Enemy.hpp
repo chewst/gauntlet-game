@@ -7,9 +7,8 @@ class Enemy : public Actor {
 public:
     Enemy(int gridX, int gridY, Color color, std::string name, int damage);
 
-
     // takeTurn() called once per player move
-    virtual void takeTurn(const Grid& grid, int playerX, int playerY) = 0;
+    virtual void takeTurn(const Grid& grid) = 0;
 
     int getDamage() const;
 

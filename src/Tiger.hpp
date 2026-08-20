@@ -7,7 +7,7 @@ class Tiger : public Enemy {
 public:
     Tiger(int gridX, int gridY, int patrolEnd, Color color, std::string name, bool vertical = false);
 
-    void takeTurn(const Grid& grid, int playerX, int playerY) override;
+    void takeTurn(const Grid& grid) override;
 
 private:
     int m_patrolStart;
