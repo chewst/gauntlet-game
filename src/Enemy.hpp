@@ -1,6 +1,5 @@
 #pragma once
 #include "Actor.hpp"
-#include "Grid.hpp"
 
 // Base class for enemies that moves on its own each turn
 class Enemy : public Actor {

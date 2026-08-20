@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Grid.hpp"
-
 // A hazard that randomly appears somewhere on the map, stays active for 3 turns and disappears for 1 turn
 class Trap {
 public:
