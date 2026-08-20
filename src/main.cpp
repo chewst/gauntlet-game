@@ -28,10 +28,10 @@ Grid buildPeninsulaMap() {
         grid.setTile(GRID_WIDTH - 1, y, TileType::Wall);
     }
 
-    grid.setTile(6, 4, TileType::Hazard);
-    grid.setTile(7, 4, TileType::Hazard);
-    grid.setTile(6, 5, TileType::Hazard);
-    grid.setTile(7, 5, TileType::Hazard);
+    grid.setTile(6, 3, TileType::Hazard);
+    grid.setTile(13, 3, TileType::Hazard);
+    grid.setTile(3, 6, TileType::Hazard);
+    grid.setTile(10, 7, TileType::Hazard);
 
     grid.setTile(9, 2, TileType::Exit);
 
@@ -238,7 +238,7 @@ int main() {
 
         drawExitMarker(9, 2);    // same as the exit tile
         drawTexture(malayTexture, player.getX(), player.getY());
-        
+
         for (const auto& enemy : enemies) {
             drawTexture(tigerTexture, enemy->getX(), enemy->getY()); 
         }
