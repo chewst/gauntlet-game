@@ -10,7 +10,7 @@
 #include <vector>
 #include <ctime>
 
-const int TILE_SIZE = 75;    // each tile is 50 x 50 pixels
+const int TILE_SIZE = 50;    // each tile is 50 x 50 pixels
 const int GRID_WIDTH = 16;
 const int GRID_HEIGHT = 10;
 const int UI_HEIGHT = 60;    // top 60 pixels are reserved for the UI
@@ -82,6 +82,21 @@ void drawActor(const Actor& actor) {
     DrawCircle(centerX, centerY, static_cast<float>(radius), actor.getColor());
 }
 
+void drawTexture(Texture2D texture, int gridX, int gridY) {
+    // convert grid coordinates to screen pixel coordinates
+    const int centerX = gridX * TILE_SIZE + TILE_SIZE / 2;
+    const int centerY = gridY * TILE_SIZE + UI_HEIGHT + TILE_SIZE / 2;
+
+    const float destSize = TILE_SIZE * 0.85f;  // make it slightly smaller than the tile
+
+    Rectangle source = { 0, 0, (float)texture.width, (float)texture.height };  // use whole image
+    Rectangle dest   = { (float)centerX, (float)centerY, destSize, destSize }; // where and how large to draw it
+    Vector2 origin   = { destSize / 2.0f, destSize / 2.0f };  // set the image's center as its pivot
+
+    // drawtexturepro allow to resize with the gridsize
+    DrawTexturePro(texture, source, dest, origin, 0.0f, WHITE);
+}
+
 void drawExitMarker(int gridX, int gridY) {
     const float centerX = gridX * TILE_SIZE + TILE_SIZE / 2.0f;
     const float centerY = gridY * TILE_SIZE + UI_HEIGHT + TILE_SIZE / 2.0f;
@@ -105,6 +120,12 @@ int main() {
     SetTargetFPS(60);  // set the frame rate
 
     srand( time(NULL) );  // use the current time to generate seed
+
+    Texture2D malayTexture = LoadTexture("assets/malay.png");
+    Texture2D chineseTexture = LoadTexture("assets/chinese.png");
+    Texture2D indianTexture = LoadTexture("assets/indian.png");
+    Texture2D tigerTexture = LoadTexture("assets/tiger.png");
+    Texture2D trapTexture = LoadTexture("assets/trap.png");
 
     Grid level = buildPeninsulaMap();
 
@@ -211,11 +232,15 @@ int main() {
         drawStatusText(trappedCharacters);
 
         drawGrid(level);
-        drawExitMarker(9, 2);    // same as the exit tile
-        drawActor(player);
+        if (trap.isActive()) {
+            drawTexture(trapTexture, trap.getX(), trap.getY());
+        }
 
+        drawExitMarker(9, 2);    // same as the exit tile
+        drawTexture(malayTexture, player.getX(), player.getY());
+        
         for (const auto& enemy : enemies) {
-            drawActor(*enemy);   
+            drawTexture(tigerTexture, enemy->getX(), enemy->getY()); 
         }
 
         if (damageMessageTimer > 0) {
@@ -235,7 +260,8 @@ int main() {
 
         for (const auto& character : trappedCharacters) {
             if (!character.isRescued()) {
-                drawActor(character);
+                const Texture2D& texture = (character.getName() == "Chinese") ? chineseTexture : indianTexture;
+                drawTexture(texture, character.getX(), character.getY());
             }
         }
 
@@ -248,6 +274,12 @@ int main() {
 
         EndDrawing();
     }
+
+    UnloadTexture(malayTexture);
+    UnloadTexture(chineseTexture);
+    UnloadTexture(indianTexture);
+    UnloadTexture(tigerTexture);
+    UnloadTexture(trapTexture);
 
     CloseWindow();
     return 0;
