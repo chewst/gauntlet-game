@@ -5,8 +5,10 @@
 
 #include "Enemy.hpp"
 #include "Tiger.hpp"
+#include "Trap.hpp"
 #include <memory>
 #include <vector>
+#include <ctime>
 
 const int TILE_SIZE = 50;    // each tile is 50 x 50 pixels
 const int GRID_WIDTH = 16;
@@ -102,6 +104,8 @@ int main() {
     InitWindow(GRID_WIDTH * TILE_SIZE, GRID_HEIGHT * TILE_SIZE + UI_HEIGHT, "Malaysia");
     SetTargetFPS(60);  // set the frame rate
 
+    srand( time(NULL) );  // use the current time to generate seed
+
     Grid level = buildPeninsulaMap();
 
     Player player(2, 2, DARKGREEN, "Malay");
@@ -113,6 +117,8 @@ int main() {
 
     std::vector<std::unique_ptr<Enemy>> enemies;
     enemies.push_back(std::make_unique<Tiger>(4, 4, 10, ORANGE, "Tiger"));
+
+    Trap trap(GRID_WIDTH, GRID_HEIGHT);
 
     bool won = false;
     bool lost = false;
@@ -156,6 +162,8 @@ int main() {
                     for (auto& enemy : enemies) {
                         enemy->takeTurn(level, player.getX(), player.getY());
                     }
+                    
+                    trap.update(level);
 
                     // check for enemy contact once, after everyone has moved this turn
                     for (const auto& enemy : enemies) {
@@ -164,6 +172,12 @@ int main() {
                             damageMessage = enemy->getName() + " hurt you! HP is now " + std::to_string(player.getHp());
                             damageMessageTimer = 90;
                         }
+                    }
+
+                    if (trap.isActiveAt(newX, newY)) {
+                        player.takeDamage(1);
+                        damageMessage = "You stepped into a trap! HP is now " + std::to_string(player.getHp());
+                        damageMessageTimer = 90;
                     }
                 }
             }
